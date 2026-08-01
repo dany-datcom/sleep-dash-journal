@@ -1,5 +1,6 @@
-import EntryCard from "./components/EntryCard";
+import EntryCard from "../components/journal/EntryCard";
 import { SleepEntry } from "@/lib/types";
+import Link from "next/link";
 
 async function getEntries(userId: number): Promise<SleepEntry[]> {
   try {
@@ -35,9 +36,12 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <button className="self-start rounded-lg bg-accent px-4 py-2 font-semibold text-white shadow transition-hover hover:bg-accent/80 md:self-auto">
+          <Link
+            href="/journal"
+            className="self-start rounded-lg bg-accent px-4 py-2 font-semibold text-white shadow transition-hover hover:bg-accent/80 md:self-auto"
+          >
             + New Entry
-          </button>
+          </Link>
         </header>
 
         {entries.length === 0 ? (
