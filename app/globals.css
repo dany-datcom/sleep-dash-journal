@@ -5,7 +5,7 @@
   --app-background: #ede0f5;
   --app-primary: #532466;
   --app-secondary: #d78ebb;
-  --app-accent: #b13e67;
+  --app-accent: #9b3659;
 }
 
 .dark {
@@ -13,7 +13,7 @@
   --app-background: #170a1f;
   --app-primary: #c899db;
   --app-secondary: #712855;
-  --app-accent: #c14e76;
+  --app-accent: #9b3659;
 }
 
 @theme {
