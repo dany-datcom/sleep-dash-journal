@@ -106,7 +106,7 @@ export default function EntryForm({
 
 
       const url = isEditing
-        ? `/api/entries/entry/${editing.id}`
+        ? `/api/entries/entry/${editing?.id}`
         : `/api/entries/${DEMO_USER_ID}`;
 
 
