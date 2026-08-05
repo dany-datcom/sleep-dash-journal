@@ -34,12 +34,9 @@ export default function EntryList({
 
     try {
 
-     const res = await fetch(
-  `/api/entries/entry/${id}`,
-  {
-    method: 'DELETE',
-  }
-);
+      const res = await fetch(`/api/entries/entry/${id}`, {
+        method: 'DELETE',
+      });
 
 
       const data = await res
@@ -48,12 +45,7 @@ export default function EntryList({
 
 
       if (!res.ok) {
-
-        setMessage(
-          data?.message || 'Delete failed.'
-        );
-
-        return;
+        throw new Error(data?.error || data?.message || 'Delete failed.');
       }
 
 
@@ -62,9 +54,7 @@ export default function EntryList({
 
     } catch (error) {
 
-      setMessage(
-        'Network error while deleting entry.'
-      );
+      setMessage(error instanceof Error ? error.message : 'Network error while deleting entry.');
 
     }
 
