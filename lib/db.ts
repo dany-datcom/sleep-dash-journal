@@ -52,7 +52,7 @@ export async function getUserInfo(user_id: number) {
 export async function createUser(first_name: string, last_name: string, email: string, password: string) {
   try {
     const client = await pool.connect();
-    const res = await client.query(`INSERT INTO sleepjournal.users (first_name, last_name, email, password) VALUES (${first_name}, ${last_name}, ${email}, ${password}`);
+    const res = await client.query(`INSERT INTO sleepjournal.users (first_name, last_name, email, password) VALUES ('${first_name}', '${last_name}', '${email}', '${password}')`);
     client.release();
     return res.rows;
   } catch (error) {
