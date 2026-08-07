@@ -45,7 +45,11 @@ export async function PUT(
 
   const body = await req.json();
 
-  const updated = await updateEntry(id, body, Number(session.user.id));
+  const updated = await updateEntry(
+  id,
+  body,
+  Number(session.user.id)
+);
 
   if (!updated) {
     return NextResponse.json(
