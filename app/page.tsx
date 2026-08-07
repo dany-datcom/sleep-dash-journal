@@ -1,27 +1,23 @@
 import EntryCard from "./components/EntryCard";
-import { SleepEntry } from "@/lib/types";
+import { getEntries } from "@/lib/db";
+import { auth } from "@/auth";
+import Link from "next/link";
 
-async function getEntries(userId: number): Promise<SleepEntry[]> {
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/entries/${userId}`, {
-      cache: "no-store",
-    });
-
-    if (!res.ok) {
-      throw new Error("Failed to fetch entries");
-    }
-
-    return res.json();
-  } catch (error) {
-    console.error("Error loading entries:", error);
-    return [];
-  }
-}
 
 export default async function HomePage() {
   // userId is being hardcoded for now until we have a way to get it from the user
-  const userId = 1;
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return (
+      <main>
+        <h1>Sleep Dashboard</h1>
+        <p>Please log in to view your sleep entries.</p>
+      </main>
+    );
+  }
+  const userId = session.user.id;
+
   const entries = await getEntries(userId);
 
   return (
@@ -35,9 +31,12 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <button className="self-start rounded-lg bg-accent px-4 py-2 font-semibold text-white shadow transition-hover hover:bg-accent/80 md:self-auto">
-            + New Entry
-          </button>
+          <Link
+  href="/journal"
+  className="self-start rounded-lg bg-accent px-4 py-2 font-semibold text-white shadow transition-hover hover:bg-accent/80 md:self-auto"
+>
+  + New Entry
+</Link>
         </header>
 
         {entries.length === 0 ? (
