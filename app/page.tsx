@@ -16,7 +16,7 @@ export default async function HomePage() {
       </main>
     );
   }
-  const userId = session.user.id;
+  const userId = Number(session.user.id);
 
   const entries = await getEntries(userId);
 
