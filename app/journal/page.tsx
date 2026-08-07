@@ -1,18 +1,14 @@
 import JournalClient from "@/components/journal/JournalClient";
-import LoginForm from "@/components/auth/LoginForm";
 import SignOutButton from "@/components/auth/SignOutButton";
 import { auth } from "@/auth";
 import { getEntries } from "@/lib/db";
+import { redirect } from "next/navigation";
 
 export default async function JournalPage() {
   const session = await auth();
 
   if (!session?.user?.id) {
-    return (
-      <main className="mx-auto flex min-h-screen w-full max-w-3xl items-center justify-center p-6">
-        <LoginForm />
-      </main>
-    );
+    redirect("/login");
   }
 
   const userId = Number(session.user.id);

@@ -1,4 +1,4 @@
-import EntryCard from "./components/EntryCard";
+import EntryCard from "@/components/journal/EntryCard";
 import { getEntries } from "@/lib/db";
 import { auth } from "@/auth";
 import Link from "next/link";

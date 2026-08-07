@@ -203,7 +203,7 @@ export default function ProfilePage() {
                       setIsEditing(false);
                       if (profile) setFormData(profile);
                     }}
-                    className="rounded-lg border border-secondary/50 px-4 py-2 text-sm font-semibold text-text transition hover:bg-secondary/10 cursor-pointer"
+                    className="rounded-lg border border-accent/50 px-4 py-2 text-sm font-semibold text-text transition hover:bg-accent/10 cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -212,7 +212,7 @@ export default function ProfilePage() {
                 <button
                   type="button"
                   onClick={() => setIsEditing(true)}
-                  className="cursor-pointer rounded-lg border border-secondary bg-secondary px-4 py-2 text-sm font-semibold text-background shadow transition-colors duration-200 hover:!bg-background hover:!text-secondary"
+                  className="cursor-pointer rounded-lg border border-accent bg-accent px-4 py-2 text-sm font-semibold text-background shadow transition-colors duration-200 hover:!bg-background hover:!text-accent"
                 >
                   Edit Profile
                 </button>

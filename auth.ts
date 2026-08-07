@@ -1,72 +1,30 @@
-import { getServerSession } from 'next-auth/next';
-import type { NextAuthOptions } from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import { getUserForAuth } from '@/lib/db';
+// auth.ts  (project root)
+import NextAuth from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
+import { z } from 'zod';
+import bcrypt from 'bcryptjs';
+import { authConfig } from './auth.config';
+import { getUserbyEmail } from './lib/db';
 
-const AUTH_SECRET =
-  process.env.AUTH_SECRET ??
-  process.env.NEXTAUTH_SECRET ??
-  'sleep-journal-development-secret';
-
-export const authOptions: NextAuthOptions = {
-  session: {
-    strategy: 'jwt',
-  },
+export const { auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   providers: [
-    CredentialsProvider({
-      name: 'Credentials',
-      credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
-      },
+    Credentials({
       async authorize(credentials) {
-        const email = credentials?.email?.trim().toLowerCase();
-        const password = credentials?.password;
+        const parsed = z
+          .object({ email: z.email(), password: z.string() })
+          .safeParse(credentials);
 
-        if (!email || !password) {
-          return null;
-        }
+        if (!parsed.success) return null;
+        const { email, password } = parsed.data;
+        const user = await getUserbyEmail(email);
+        if (!user) return null;
 
-        const user = await getUserForAuth(email);
+        const passwordsMatch = await bcrypt.compare(password, user.password);
+        if (passwordsMatch) return user;
 
-        if (!user || user.password !== password) {
-          return null;
-        }
-
-        return {
-          id: String(user.user_id),
-          email: user.email,
-          name: [user.first_name, user.last_name].filter(Boolean).join(' '),
-        };
+        return null;
       },
     }),
   ],
-  pages: {
-    signIn: '/journal',
-  },
-  callbacks: {
-    jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-      }
-
-      return token;
-    },
-    session({ session, token }) {
-      if (session.user && token.id) {
-        session.user.id = String(token.id);
-      }
-
-      return session;
-    },
-  },
-  secret: AUTH_SECRET,
-};
-
-export const auth = async () => {
-  try {
-    return await getServerSession(authOptions);
-  } catch {
-    return null;
-  }
-};
+});
