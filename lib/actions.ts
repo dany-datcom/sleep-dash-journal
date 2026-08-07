@@ -1,6 +1,7 @@
 'use server';
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { signOut } from '@/auth';
@@ -78,9 +79,14 @@ export async function createUserAction(prevState: State, formData: FormData): Pr
 
   const cryptedPassword = await bcrypt.hash(parsed.data.password, 12);
 
+  let success = false;
+
   try {
     await createUser(parsed.data.first_name, parsed.data.last_name, parsed.data.email, cryptedPassword);
-    redirect('/login');
+    success = true;
+    return {
+      message: 'User created successfully. Please log in.',
+    };
   } catch (error) {
     console.error('Error creating user:', error);
     return {

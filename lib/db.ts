@@ -17,8 +17,7 @@ export async function getEntries(user_id: number) {
   try {
     const client = await pool.connect();
     const res = await client.query(
-      'SELECT * FROM sleepjournal.entries WHERE user_id = $1 ORDER BY entry_id DESC',
-      [user_id]
+      `SELECT * FROM sleepjournal.entries WHERE user_id = ${user_id} ORDER BY entry_id DESC`
     );
     client.release();
     return res.rows;
@@ -32,8 +31,7 @@ export async function getEntryById(entry_id: number) {
   try {
     const client = await pool.connect();
     const res = await client.query(
-      'SELECT * FROM sleepjournal.entries WHERE entry_id = $1 LIMIT 1',
-      [entry_id]
+      `SELECT * FROM sleepjournal.entries WHERE entry_id = ${entry_id} LIMIT 1`
     );
     client.release();
     return res.rows[0] ?? null;
