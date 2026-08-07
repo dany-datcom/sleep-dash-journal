@@ -122,7 +122,7 @@ export default function JournalEntryCard({
       setShowDeleteConfirm(false);
 
     } catch (error) {
-      setMessage('Failed to delete entry.');
+      setMessage(error instanceof Error ? error.message : 'Failed to delete entry.');
 
     } finally {
       setDeleting(false);

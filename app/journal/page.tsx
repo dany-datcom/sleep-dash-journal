@@ -1,10 +1,22 @@
 import JournalClient from "@/components/journal/JournalClient";
+import LoginForm from "@/components/auth/LoginForm";
+import SignOutButton from "@/components/auth/SignOutButton";
+import { auth } from "@/auth";
 import { getEntries } from "@/lib/db";
 
-const DEMO_USER_ID = 1;
-
 export default async function JournalPage() {
-  const initialEntries = await getEntries(DEMO_USER_ID);
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return (
+      <main className="mx-auto flex min-h-screen w-full max-w-3xl items-center justify-center p-6">
+        <LoginForm />
+      </main>
+    );
+  }
+
+  const userId = Number(session.user.id);
+  const initialEntries = await getEntries(userId);
 
   const safeEntries = initialEntries.map((e) => ({
     ...e,
@@ -19,14 +31,19 @@ export default async function JournalPage() {
   }));
 
   return (
-    <main className="max-w-3xl mx-auto p-6 space-y-4">
-      <h1 className="text-2xl font-bold">Sleep Journal</h1>
+    <main className="mx-auto w-full max-w-3xl p-6 space-y-4">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">Sleep Journal</h1>
+          <p className="text-sm text-slate-600">
+            Create, edit, and delete your sleep entries.
+          </p>
+        </div>
 
-      <p className="text-sm text-slate-600">
-        Create, edit, and delete your sleep entries.
-      </p>
+        <SignOutButton />
+      </div>
 
-      <JournalClient initialEntries={safeEntries} />
+      <JournalClient initialEntries={safeEntries} userId={userId} />
     </main>
   );
 }

@@ -18,9 +18,8 @@ type Entry = {
 
 type Props = {
   initialEntries: unknown[];
+  userId: number;
 };
-
-const DEMO_USER_ID = 1;
 
 
 function mapEntry(entry: unknown): Entry {
@@ -54,6 +53,7 @@ function mapEntry(entry: unknown): Entry {
 
 export default function JournalClient({
   initialEntries,
+  userId,
 }: Props) {
 
   const [entries, setEntries] = useState<Entry[]>(
@@ -73,7 +73,7 @@ export default function JournalClient({
 
     try {
 
-      const res = await fetch(`/api/entries/${DEMO_USER_ID}`);
+      const res = await fetch(`/api/entries/${userId}`);
 
       if (!res.ok) {
         throw new Error('Failed to load entries');
@@ -86,7 +86,7 @@ export default function JournalClient({
       );
 
 
-    } catch (error) {
+    } catch {
 
       addToast(
         'Unable to refresh sleep entries.',
@@ -116,10 +116,12 @@ export default function JournalClient({
     <div className="space-y-4">
 
       <EntryForm
+        key={editing?.id ?? 'new'}
         editing={editing}
         setEditing={setEditing}
         onDone={refresh}
         setMessage={handleSetMessage}
+        userId={userId}
       />
 
 

@@ -16,7 +16,10 @@ const pool = new Pool({
 export async function getEntries(user_id: number) {
   try {
     const client = await pool.connect();
-    const res = await client.query(`SELECT * FROM sleepjournal.entries WHERE user_id = ${user_id}`);
+    const res = await client.query(
+      'SELECT * FROM sleepjournal.entries WHERE user_id = $1 ORDER BY entry_id DESC',
+      [user_id]
+    );
     client.release();
     return res.rows;
   } catch (error) {
@@ -28,9 +31,12 @@ export async function getEntries(user_id: number) {
 export async function getEntryById(entry_id: number) {
   try {
     const client = await pool.connect();
-    const res = await client.query(`SELECT * FROM sleepjournal.entries WHERE entry_id = ${entry_id}`);
+    const res = await client.query(
+      'SELECT * FROM sleepjournal.entries WHERE entry_id = $1 LIMIT 1',
+      [entry_id]
+    );
     client.release();
-    return res.rows;
+    return res.rows[0] ?? null;
   } catch (error) {
     console.error('Error fetching entries:', error);
     throw new Error('Failed to fetch data');
@@ -40,9 +46,27 @@ export async function getEntryById(entry_id: number) {
 export async function getUserInfo(user_id: number) {
   try {
     const client = await pool.connect();
-    const res = await client.query(`SELECT user_id, first_name, last_name, email FROM sleepjournal.users WHERE user_id = ${user_id}`);
+    const res = await client.query(
+      'SELECT user_id, first_name, last_name, email FROM sleepjournal.users WHERE user_id = $1 LIMIT 1',
+      [user_id]
+    );
     client.release();
-    return res.rows;
+    return res.rows[0] ?? null;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    throw new Error('Failed to fetch data');
+  }
+}
+
+export async function getUserForAuth(email: string) {
+  try {
+    const client = await pool.connect();
+    const res = await client.query(
+      'SELECT user_id, first_name, last_name, email, password FROM sleepjournal.users WHERE email = $1 LIMIT 1',
+      [email]
+    );
+    client.release();
+    return res.rows[0] ?? null;
   } catch (error) {
     console.error('Error fetching users:', error);
     throw new Error('Failed to fetch data');
@@ -142,7 +166,8 @@ export async function updateEntry(
     wake_time: string;
     sleep_quality: number;
     notes: string;
-  }
+  },
+  user_id: number,
 ) {
   const client = await pool.connect();
 
@@ -156,6 +181,7 @@ SET
     sleep_quality = $3,
     notes = $4
 WHERE entry_id = $5
+AND user_id = $6
 RETURNING *
       `,
       [
@@ -164,6 +190,7 @@ RETURNING *
   entry.sleep_quality,
   entry.notes,
   entry_id,
+        user_id,
       ]
     );
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useState } from 'react';
 
 type Entry = {
   id: number;
@@ -17,9 +17,8 @@ type Props = {
   setEditing: (entry: Entry | null) => void;
   onDone: () => Promise<void>;
   setMessage: (msg: string) => void;
+  userId: number;
 };
-
-const DEMO_USER_ID = 1;
 
 function convertTo12Hour(time: string) {
   const [hour, minute] = time.split(':').map(Number);
@@ -38,38 +37,16 @@ export default function EntryForm({
   setEditing,
   onDone,
   setMessage,
+  userId,
 }: Props) {
 
-  const [date, setDate] = useState('');
-  const [bedtime, setBedtime] = useState('');
-  const [wakeTime, setWakeTime] = useState('');
-  const [mood, setMood] = useState('');
-  const [notes, setNotes] = useState('');
+  const [date, setDate] = useState(editing?.date.slice(0, 10) ?? '');
+  const [bedtime, setBedtime] = useState(editing?.bedtime ?? '');
+  const [wakeTime, setWakeTime] = useState(editing?.wakeTime ?? '');
+  const [mood, setMood] = useState(editing?.mood?.toString() ?? '');
+  const [notes, setNotes] = useState(editing?.notes ?? '');
 
   const [submitting, setSubmitting] = useState(false);
-
-
-  function loadEntry(entry: Entry) {
-    setDate(entry.date.slice(0, 10));
-    setBedtime(entry.bedtime);
-    setWakeTime(entry.wakeTime);
-    setMood(entry.mood?.toString() ?? '');
-    setNotes(entry.notes ?? '');
-  }
-
-
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => {
-    if (editing) {
-      loadEntry(editing);
-    } else {
-      setDate('');
-      setBedtime('');
-      setWakeTime('');
-      setMood('');
-      setNotes('');
-    }
-  }, [editing]);
 
 
   function resetForm() {
@@ -107,7 +84,7 @@ export default function EntryForm({
 
       const url = isEditing
         ? `/api/entries/entry/${editing?.id}`
-        : `/api/entries/${DEMO_USER_ID}`;
+        : `/api/entries/${userId}`;
 
 
       const method = isEditing
@@ -135,6 +112,7 @@ export default function EntryForm({
       if (!res.ok) {
 
         setMessage(
+          data?.error ||
           data?.message ||
           'Operation failed.'
         );
