@@ -10,9 +10,16 @@ export default async function HomePage() {
 
   if (!session?.user?.id) {
     return (
-      <main>
+         <main>
         <h1>Sleep Dashboard</h1>
         <p>Please log in to view your sleep entries.</p>
+      <main className="min-h-screen bg-background p-6 md:p-10 text-text">
+          <div>
+            <h1 className="text-3xl font-extrabold text-primary">Sleep Dashboard</h1>
+            <p className="mt-1 text-sm text-text/80">
+              Please log in to view your sleep entries and track your sleep patterns.
+            </p>
+          </div>
       </main>
     );
   }
