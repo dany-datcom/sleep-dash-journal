@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 import { authConfig } from './auth.config';
 import { getUserbyEmail } from './lib/db';
 
-export const { auth, signIn, signOut } = NextAuth({
+export const { auth, signIn, signOut,handlers } = NextAuth({
   ...authConfig,
   providers: [
     Credentials({
@@ -23,8 +23,27 @@ export const { auth, signIn, signOut } = NextAuth({
         const passwordsMatch = await bcrypt.compare(password, user.password);
         if (passwordsMatch) return user;
 
-        return null;
+        return user;
       },
     }),
   ],
+   callbacks: {
+    ...authConfig.callbacks,
+
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+      }
+
+      return session;
+    },
+  },
 });

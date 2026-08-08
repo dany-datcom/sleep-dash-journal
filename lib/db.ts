@@ -56,6 +56,37 @@ export async function getUserInfo(user_id: number) {
   }
 }
 
+export async function updateUser(
+  user_id: number,
+  first_name: string,
+  last_name: string,
+  email: string
+) {
+  const client = await pool.connect();
+
+  try {
+    const result = await client.query(
+      `
+      UPDATE sleepjournal.users
+      SET
+        first_name = $1,
+        last_name = $2,
+        email = $3
+      WHERE user_id = $4
+      RETURNING user_id, first_name, last_name, email
+      `,
+      [first_name, last_name, email, user_id]
+    );
+
+    return result.rows[0] ?? null;
+  } catch (error) {
+    console.error('Error updating user:', error);
+    throw new Error('Failed to update user');
+  } finally {
+    client.release();
+  }
+}
+
 export async function getUserForAuth(email: string) {
   try {
     const client = await pool.connect();
